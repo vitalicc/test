@@ -11,5 +11,11 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <!--<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>-->
   <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log("SW зарегистрирован"))
+        .catch(err => console.error("Ошибка SW", err));
+    }
 </body>
 </html>
