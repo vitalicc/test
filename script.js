@@ -1,6 +1,7 @@
 const map = L.map('map').setView([49.083798038160786, 33.4204394941353], 17);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors'
+L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '© OpenStreetMap France | © OpenStreetMap contributors'
 }).addTo(map);
 
 const lights = [
