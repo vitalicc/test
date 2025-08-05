@@ -1,6 +1,7 @@
 const map = L.map('map').setView([49.0836, 33.4263], 17);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
+  attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
 const lights = [
@@ -15,34 +16,34 @@ const lights = [
 ];
 
 function getLightPhase(time, offset = 0) {
-  const cycle = 65; // full cycle: green 30s, yellow 5s, red 30s
+  const cycle = 65; // green 30s, yellow 5s, red 30s
   const t = (time + offset) % cycle;
   if (t < 30) return { color: "green", remaining: 30 - t };
   if (t < 35) return { color: "yellow", remaining: 35 - t };
   return { color: "red", remaining: 65 - t };
 }
 
+function createLightIcon(color) {
+  return L.divIcon({
+    className: 'custom-icon',
+    html: `<div class="circle" style="background-color:${color};"></div>`,
+    iconSize: [16, 16],
+    iconAnchor: [8, 8]
+  });
+}
+
 function createLightMarker(light) {
-  const div = document.createElement('div');
-  div.className = 'traffic-light';
   const marker = L.marker(light.coords, {
-    icon: L.divIcon({
-      className: 'custom-icon',
-      html: div.outerHTML
-    })
+    icon: createLightIcon('gray') // начальный цвет (можно любой)
   }).addTo(map);
-  light._el = div;
   light._marker = marker;
 }
 
 function updateLights() {
   const t = Math.floor(Date.now() / 1000);
   lights.forEach(light => {
-    const { color, remaining } = getLightPhase(t, light.offset);
-    light._marker.setIcon(L.divIcon({
-      className: 'custom-icon',
-      html: `<div class="traffic-light" style="color:${color}">${color}<br>${remaining}s</div>`
-    }));
+    const { color } = getLightPhase(t, light.offset);
+    light._marker.setIcon(createLightIcon(color));
   });
 }
 
