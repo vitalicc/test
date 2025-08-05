@@ -3,7 +3,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
-const lights = [
+/*const lights = [
   {
     coords: [49.082808980594464, 33.42592096675134],
     offset: 0
@@ -47,4 +47,4 @@ function updateLights() {
 }
 
 lights.forEach(createLightMarker);
-setInterval(updateLights, 1000);
+setInterval(updateLights, 1000);*/
