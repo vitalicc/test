@@ -1,15 +1,20 @@
+
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Світлофор</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Светофор</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#222222" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div id="colorDisplay">Цвет: 🟢 <br/> До смены: 10 с</div>
   <div id="map"></div>
+
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <!--<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>-->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="script.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
@@ -17,6 +22,6 @@
         .then(() => console.log("SW зарегистрирован"))
         .catch(err => console.error("Ошибка SW", err));
     }
-    </script>
+  </script>
 </body>
 </html>
