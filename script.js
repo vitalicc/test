@@ -7,7 +7,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 const lights = [
   {
     coords: [49.082808980594464, 33.42592096675134],
-    startDateTime: '2025-08-07T11:12:37',
+    startDateTime: '2025-08-07T11:58:04',
     cycle: 71, // 20s green, 5s yellow, 35s red
     phases: { green: 25, yellow: 0, red: 44.9 }
   },
