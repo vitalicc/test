@@ -8,7 +8,7 @@ const lights = [
   {
     coords: [49.082808980594464, 33.42592096675134],
     startDateTime: '2025-08-07T11:04:26',
-    cycle: 60, // 20s green, 5s yellow, 35s red
+    cycle: 71, // 20s green, 5s yellow, 35s red
     phases: { green: 25, yellow: 0, red: 46 }
   },
   {
