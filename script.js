@@ -1,4 +1,4 @@
-const map = L.map('map').setView([49.083798038160786, 33.4204394941353], 17);
+const map = L.map('map').setView([49.082808980594464, 33.4259209667513], 17);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors'
 }).addTo(map);
@@ -9,7 +9,7 @@ const lights = [
     coords: [49.082808980594464, 33.42592096675134],
     startDateTime: '2025-08-07T11:58:04',
     cycle: 71, // 20s green, 5s yellow, 35s red
-    phases: { green: 25, yellow: 0, red: 47}
+    phases: { green: 25, yellow: 0, red: 46}
   },
   {
     coords: [49.084544079080636, 33.42673412556371],
