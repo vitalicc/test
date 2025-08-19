@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <title>Панель керування світлофорами</title>
+  <link rel="stylesheet" href="controle_style.css" />
+</head>
+<body>
+
+<h1>Панель керування світлофорами</h1>
+
+<div>
+  <select id="lightSelect">
+    <option value="">-- Виберіть світлофор --</option>
+  </select>
+</div>
+
+<div id="buttons-container">
+  <button id="addLightBtn">Додати світлофор</button>
+  <button id="saveBtn">Зберегти зміни</button>
+</div>
+
+<div id="lights-container"></div>
+
+<script>
+  let lights = [];
+  let currentIndex = null;
+
+  function createLightForm(light = {}, index) {
+    const div = document.createElement('div');
+    div.className = 'light-block';
+
+    div.innerHTML = `
+      <button class="delete-btn" title="Видалити світлофор">×</button>
+      <label>Опис:<br>
+        <input type="text" name="description" value="${light.description || ''}" placeholder="Перехрестя, вулиця тощо">
+      </label>
+      <label>Координати (lat,lng):<br>
+        <input type="text" name="coords" placeholder="49.0828, 33.4259" value="${light.coords ? light.coords.join(', ') : ''}">
+      </label>
+      <label>Дата та час старту (без секунд):<br>
+        <input type="datetime-local" name="startDateTimeBase" value="${light.startDateTime ? light.startDateTime.slice(0,16) : ''}">
+      </label>
+      <label>Секунди та мілісекунди:<br>
+        <input type="text" name="startSeconds" placeholder="00.000" value="${light.startDateTime && light.startDateTime.length > 16 ? light.startDateTime.slice(17) : '00.000'}">
+      </label>
+      <label>Добовий сдвиг старту (секунди):<br>
+        <input type="number" name="dailyStartOffset" step="0.001" value="${light.dailyStartOffset !== undefined ? light.dailyStartOffset : 0}">
+      </label>
+      <label>Фази (секунди):<br>
+        Зелений: <input type="number" name="green" step="0.1" min="0" value="${light.phases ? light.phases.green : ''}">,
+        Жовтий: <input type="number" name="yellow" step="0.1" min="0" value="${light.phases ? light.phases.yellow : ''}">,
+        Червоний: <input type="number" name="red" step="0.1" min="0" value="${light.phases ? light.phases.red : ''}">
+      </label>
+    `;
+
+    div.querySelector('.delete-btn').addEventListener('click', () => {
+      if (confirm('Ви впевнені, що хочете видалити цей світлофор?')) {
+        lights.splice(index, 1);
+        updateSelect();
+        document.getElementById('lights-container').innerHTML = '';
+      }
+    });
+
+    return div;
+  }
+
+  function updateSelect() {
+    const select = document.getElementById('lightSelect');
+    select.innerHTML = '<option value="">-- Виберіть світлофор --</option>';
+    lights.forEach((light, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = light.description || `Світлофор ${i+1}`;
+      select.appendChild(opt);
+    });
+  }
+
+  document.getElementById('lightSelect').addEventListener('change', (e) => {
+    currentIndex = e.target.value ? parseInt(e.target.value) : null;
+    const container = document.getElementById('lights-container');
+    container.innerHTML = '';
+    if (currentIndex !== null) {
+      container.appendChild(createLightForm(lights[currentIndex], currentIndex));
+    }
+  });
+
+  document.getElementById('addLightBtn').addEventListener('click', () => {
+    const newLight = { description: '', coords: [], startDateTime: '', phases: { green: 0, yellow: 0, red: 0 } };
+    lights.push(newLight);
+    updateSelect();
+  });
+
+  document.getElementById('saveBtn').addEventListener('click', () => {
+    const block = document.querySelector('.light-block');
+    if (block && currentIndex !== null) {
+      const description = block.querySelector('input[name="description"]').value.trim();
+      const coordsStr = block.querySelector('input[name="coords"]').value.trim();
+      const startDateTimeBase = block.querySelector('input[name="startDateTimeBase"]').value;
+      const startSeconds = block.querySelector('input[name="startSeconds"]').value.trim();
+      const dailyStartOffset = parseFloat(block.querySelector('input[name="dailyStartOffset"]').value.replace(',', '.')) || 0;
+
+      // Заміна коми на крапку у фазах перед парсингом
+      const greenStr = block.querySelector('input[name="green"]').value.replace(',', '.');
+      const yellowStr = block.querySelector('input[name="yellow"]').value.replace(',', '.');
+      const redStr = block.querySelector('input[name="red"]').value.replace(',', '.');
+
+      const green = parseFloat(greenStr);
+      const yellow = parseFloat(yellowStr);
+      const red = parseFloat(redStr);
+
+      const coords = coordsStr.split(',').map(c => parseFloat(c.trim()));
+      let startDateTime = startDateTimeBase;
+      if (startSeconds) startDateTime += ':' + startSeconds;
+
+      lights[currentIndex] = {
+        description, coords, startDateTime,
+        dailyStartOffset,
+        phases: { green, yellow, red }
+      };
+    }
+
+    fetch('/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Basic ' + btoa('vetal:Elenael1!')
+      },
+      body: JSON.stringify(lights)
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Статус: ' + res.status);
+      return res.json();
+    })
+    .then(resp => alert(resp.message))
+    .catch(err => alert('Помилка збереження: ' + err));
+  });
+
+  fetch('lights.json')
+    .then(res => res.json())
+    .then(data => {
+      lights = data;
+      updateSelect();
+    })
+    .catch(err => alert('Помилка завантаження: ' + err));
+</script>
+
+</body>
+</html>
