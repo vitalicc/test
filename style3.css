@@ -1,0 +1,33 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#map {
+  height: 100%;
+  width: 100%;
+}
+
+.traffic-light {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 10px solid #333;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timer {
+  position: absolute;
+  top: 24px;
+  color: black;
+  font-size: 12px;
+  background: white;
+  padding: 1px 4px;
+  border-radius: 4px;
+  border: 1px solid #aaa;
+  white-space: nowrap;
+}
