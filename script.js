@@ -117,8 +117,9 @@ function updateLights() {
           <div class="timer">Старт через ${(remainingMs / 1000).toFixed(1)}s</div>
         </div>`;
       } else {
-        htmlContent = `<div class="traffic-light" style="background:${color}">
-          <div class="timer">${Math.ceil(remainingMs / 1000)}s</div>
+        htmlContent = `<div class="crossroad">
+            ${light.description || 'Без названия'}
+          <div class="timer" style="color:${color}">${Math.ceil(remainingMs / 1000)}s</div>
         </div>`;
       }
 
