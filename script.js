@@ -1,42 +1,89 @@
-const map = L.map('map').setView([49.092808980594464, 33.42592096675134], 17);
+const savedLat = parseFloat(localStorage.getItem('mapLat'));
+const savedLng = parseFloat(localStorage.getItem('mapLng'));
+const savedZoom = parseInt(localStorage.getItem('mapZoom'), 10);
+
+// Якщо значення валідні — беремо їх, інакше дефолтні
+const initialLat = !isNaN(savedLat) ? savedLat : 49.082808980594464;
+const initialLng = !isNaN(savedLng) ? savedLng : 33.42592096675134;
+const initialZoom = !isNaN(savedZoom) ? savedZoom : 20;
+
+const map = L.map('map').setView([initialLat, initialLng], initialZoom);
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
-// Светофоры с координатами, сдвигом и полной датой старта
-const lights = [
-  {
-    coords: [49.082808980594464, 33.42592096675134],
-    startDateTime: '2025-08-07T11:58:04',
-    cycle: 71, // 20s green, 5s yellow, 35s red
-    phases: { green: 25, yellow: 0, red: 46}
-  },
-  {
-    coords: [49.084544079080636, 33.42673412556371],
-    startDateTime: '2025-08-06T08:01:00',
-    cycle: 90, // 40s green, 10s yellow, 40s red
-    phases: { green: 40, yellow: 10, red: 40 }
+// При зміні позиції або масштабу карти зберігаємо нові значення в localStorage
+map.on('moveend', () => {
+  const center = map.getCenter();
+  localStorage.setItem('mapLat', center.lat);
+  localStorage.setItem('mapLng', center.lng);
+  localStorage.setItem('mapZoom', map.getZoom());
+});
+
+
+
+
+
+
+
+
+let lights = []; // масив світлофорів, завантажиться з JSON
+
+// Функція визначення фази світлофора
+function getLightPhase(currentMs, light) {
+  const elapsedMs = currentMs - light._startUnixMs;
+  if (elapsedMs < 0) {
+    return { color: "off", remainingMs: -elapsedMs };
   }
-];
-
-
-function getLightPhase(currentUnixTime, light) {
-  const elapsed = currentUnixTime - light._startUnix;
-  if (elapsed < 0) return { color: "off", remaining: -elapsed }; // еще не начал работать
 
   const { green, yellow, red } = light.phases;
-  const totalCycle = green + yellow + red;
-  const t = elapsed % totalCycle;
+  const totalCycleMs = (green + yellow + red) * 1000;
+  const tMs = elapsedMs % totalCycleMs;
 
-  if (t < green) return { color: "green", remaining: green - t };
-  if (t < green + yellow) return { color: "yellow", remaining: green + yellow - t };
-  return { color: "red", remaining: totalCycle - t };
+  if (tMs < green * 1000) {
+    return { color: "green", remainingMs: green * 1000 - tMs };
+  }
+  if (tMs < (green + yellow) * 1000) {
+    return { color: "yellow", remainingMs: (green + yellow) * 1000 - tMs };
+  }
+  return { color: "red", remainingMs: totalCycleMs - tMs };
 }
 
-function parseStartTime(dateTimeStr) {
-  return Math.floor(new Date(dateTimeStr).getTime() / 1000);
+
+
+// Отримуємо дату та час старту, повертаємо кількість Unix мс дати та часу старту + добові зсуви 
+function parseStartTime(dateTimeStr, light) {
+  const baseDate = new Date(dateTimeStr);
+  const now = new Date();
+
+   // Сегодняшняя дата + стартовое время
+  const todayStart = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    baseDate.getHours(),
+    baseDate.getMinutes(),
+    baseDate.getSeconds(),
+    baseDate.getMilliseconds()
+  );
+
+  // Сколько календарных суток прошло (без учёта времени)
+  const baseDateOnly = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate());
+  const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const daysPassed = Math.floor((nowDateOnly - baseDateOnly) / 86400000);
+
+  // Сдвиг в мс: каждые сутки + ежедневный сдвиг
+  const dailyOffsetMs = daysPassed * light.dailyStartOffset  * 1000;
+
+  return todayStart.getTime() + dailyOffsetMs;
 }
 
+
+
+
+// Створення маркера світлофора на карті
 function createLightMarker(light) {
   const div = document.createElement('div');
   div.className = 'traffic-light';
@@ -47,38 +94,68 @@ function createLightMarker(light) {
     })
   }).addTo(map);
   light._marker = marker;
-  light._startUnix = parseStartTime(light.startDateTime);
+  light._startUnixMs = parseStartTime(light.startDateTime, light);
 }
 
+
+
+
+
+
+
+
+
+// Оновлення стану світлофорів на карті ()
 function updateLights() {
-  const nowUnix = Math.floor(Date.now() / 1000);
+    const nowMs = Date.now();
+    lights.forEach(light => {
+      const { color, remainingMs } = getLightPhase(nowMs, light);
 
-  lights.forEach(light => {
-    const { color, remaining } = getLightPhase(nowUnix, light);
+      let htmlContent;
+      if (color === 'off') {
+        htmlContent = `<div class="traffic-light" style="background:gray">
+          <div class="timer">Старт через ${(remainingMs / 1000).toFixed(1)}s</div>
+        </div>`;
+      } else {
+        htmlContent = `<div class="traffic-light" style="background:${color}">
+          <div class="timer">${Math.ceil(remainingMs / 1000)}s</div>
+        </div>`;
+      }
 
-    let htmlContent;
-    if (color === 'off') {
-      htmlContent = `<div class="traffic-light" style="background:gray">
-        <div class="timer">Старт через ${remaining}s</div>
-      </div>`;
-    } else {
-      htmlContent = `<div class="traffic-light" style="background:${color}">
-        <div class="timer">${Math.ceil(remaining)}s</div>
-      </div>`;
-    }
-
-    light._marker.setIcon(L.divIcon({
-      className: 'custom-icon',
-      html: htmlContent
-    }));
-  });
+      light._marker.setIcon(L.divIcon({
+        className: 'custom-icon',
+        html: htmlContent
+      }));
+    });
 }
 
-lights.forEach(createLightMarker);
-setInterval(updateLights, 1000);
+// Ініціалізація світлофорів після завантаження даних
+/*function loopLights() {
+  updateLights();
+  setInterval(loopLights, 100);
+}
+*/
 
-//Добавляем меня по координатам
+// 1 функция - инициализация! Вызываются ф-ии createLightMarker и в них передаются объекты свет
+function initializeLights() {
+  lights.forEach(createLightMarker);
+  updateLights(); // первый вызов сразу
+  setInterval(updateLights, 100);   // дальше — синхронно с секундами
+}
 
+// Завантаження даних світлофорів з JSON
+fetch('lights.json')
+  .then(response => {
+    if (!response.ok) throw new Error('Не вдалося завантажити lights.json');
+    return response.json();
+  })
+  .then(data => {
+    lights = data;
+    initializeLights();
+  })
+  .catch(err => console.error(err));
+
+// --- Користувач на карті ---
 let userMarker = null;
 
 function updateUserLocation(position) {
@@ -97,7 +174,6 @@ function updateUserLocation(position) {
   }
 }
 
-// Запрашиваем позицию и следим за изменениями
 if (navigator.geolocation) {
   navigator.geolocation.watchPosition(updateUserLocation, (err) => {
     console.warn("Геолокація не доступна:", err.message);
@@ -109,5 +185,3 @@ if (navigator.geolocation) {
 } else {
   alert("Геолокація не підтримується в цьому браузері.");
 }
-
-
