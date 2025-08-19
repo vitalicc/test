@@ -1,18 +1,25 @@
 <!DOCTYPE html>
-<html lang="uk">
-
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Світлофор</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>OpenLayers Map with Traffic Lights and User Tracking</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-  <div id="map"></div>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <h1>Стан світлофорів</h1>
+
+<div id="tableContainer">
+  <table id="lightsTable">
+    <thead>
+      <tr>
+        <th>Перехрестя</th>
+        <th>Час до зміни</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
   <script src="script.js"></script>
 </body>
-
 </html>
