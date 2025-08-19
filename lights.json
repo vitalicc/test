@@ -104,7 +104,7 @@
       33.4326088
     ],
     "startDateTime": "2025-08-15T00:01:09",
-    "dailyStartOffset": 0,
+    "dailyStartOffset": 2,
     "phases": {
       "green": 33,
       "yellow": 0,
