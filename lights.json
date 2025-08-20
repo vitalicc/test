@@ -33,7 +33,7 @@
       49.084544079080636,
       33.42673412556371
     ],
-    "startDateTime": "2025-08-13T00:00:18",
+    "startDateTime": "2025-08-13T00:00:18.500",
     "dailyStartOffset": 2,
     "phases": {
       "green": 38,
@@ -47,7 +47,7 @@
       49.0863945,
       33.4273453
     ],
-    "startDateTime": "2025-08-13T00:00:39",
+    "startDateTime": "2025-08-13T00:00:38.500",
     "dailyStartOffset": 2,
     "phases": {
       "green": 35,
@@ -61,7 +61,7 @@
       49.08907057655492,
       33.42853429721467
     ],
-    "startDateTime": "2025-08-13T00:01:17",
+    "startDateTime": "2025-08-13T00:01:16",
     "dailyStartOffset": 2,
     "phases": {
       "green": 34,
@@ -75,7 +75,7 @@
       49.0933922,
       33.4302351
     ],
-    "startDateTime": "2025-08-12T00:00:33",
+    "startDateTime": "2025-08-12T00:00:44.500",
     "dailyStartOffset": 0,
     "phases": {
       "green": 43,
@@ -118,7 +118,7 @@
       33.4338846
     ],
     "startDateTime": "2025-08-15T00:00:33",
-    "dailyStartOffset": 0,
+    "dailyStartOffset": 2,
     "phases": {
       "green": 38,
       "yellow": 0,
@@ -126,17 +126,17 @@
     }
   },
   {
-    "description": "Казацька",
+    "description": "Півзавод",
     "coords": [
-      49.116708,
-      33.4400825
+      49.1081687,
+      33.4364598
     ],
-    "startDateTime": "2025-08-16T00:00:40.500",
+    "startDateTime": "2025-08-16T00:01:01",
     "dailyStartOffset": 0,
     "phases": {
-      "green": 39,
+      "green": 46,
       "yellow": 0,
-      "red": 31
+      "red": 27
     }
   },
   {
@@ -154,17 +154,17 @@
     }
   },
   {
-    "description": "Півзавод",
+    "description": "Казацька",
     "coords": [
-      49.1081687,
-      33.4364598
+      49.116708,
+      33.4400825
     ],
-    "startDateTime": "2025-08-16T00:01:01",
+    "startDateTime": "2025-08-16T00:00:40.500",
     "dailyStartOffset": 0,
     "phases": {
-      "green": 46,
+      "green": 39,
       "yellow": 0,
-      "red": 27
+      "red": 31
     }
   }
 ]
